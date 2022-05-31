@@ -106,12 +106,32 @@ const addVideoStream = async(video, userName, stream) => {
             // user = csData.data.data.cs_id.profile.firstname;
             let container_div = document.getElementById('video-grid');
             let count = container_div.getElementsByTagName('video').length;
+            if (count > 1) {
+              let element = document.getElementById('video-name').children[1]
+              element.innerHTML = "Care provider: " + csData.data.data.schedule.cp_id.firstname;
+              console.log("ningsulod", element);
+            }
             if (count < 2) {
               let nameHtml = `<span class="text-white p-10 name m-13">Care seeker: ${userName != "test"? userName : csData.data.data.cs_id.profile.firstname}</span>`;
               videoName.innerHTML += nameHtml;
+            } 
+            if (count < 3) {
+              video.play();
+              videoGrid.append(video);
+            } else {
+              document.getElementById("video-grid").remove();
+              
+              Swal.fire({
+                title: 'Info!',
+                text: `This session is only limited to 2 users`,
+                icon: 'info',
+                showCancelButton: false,
+                showConfirmButton: false,
+                closeOnClickOutside: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+              })
             }
-            video.play();
-            videoGrid.append(video);
             // Session type filter (video, chat, voice)
             // if (csData.data.data.schedule.session_type) {
             //   if(!(csData.data.data.schedule.session_type).includes("video")) {
@@ -136,13 +156,31 @@ const addVideoStream = async(video, userName, stream) => {
             // user = cpData.data.data.cp_id.firstname;
             let container_div = document.getElementById('video-grid');
             let count = container_div.getElementsByTagName('video').length;
+            if (count > 1) {
+              let element = document.getElementById('video-name').children[1]
+              element.innerHTML = "Care Seeker: " + cpData.data.data.session_set.cs_id.profile.firstname;
+              console.log("ningsulod", element);
+            }
             if (count < 2) {
               let nameHtml = `<span class="text-white p-10 name m-13">Care provider: ${userName != "test"? userName: cpData.data.data.cp_id.firstname}</span>`;
               videoName.innerHTML += nameHtml;
+            } 
+            if (count < 3) {
+              video.play();
+              videoGrid.append(video);
+            } else {
+              document.getElementById("video-grid").remove();
+              Swal.fire({
+                title: 'Info!',
+                text: `This session is only limited to 2 users`,
+                icon: 'info',
+                showCancelButton: false,
+                showConfirmButton: false,
+                closeOnClickOutside: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+              })
             }
-            // videoGrid.innerHTML += html;
-            video.play();
-            videoGrid.append(video);
             // Session type filter (video, chat, voice)
             // if (cpData.data.data.session_type) {
             //   if(!(cpData.data.data.session_type).includes("video")) {
@@ -261,7 +299,6 @@ const getSession = async(req, res) => {
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
-      console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
       if (format_session_date == format_current_date) { //!=
         Swal.fire({
@@ -414,7 +451,7 @@ const checkEndTime = async (req, res) => {
     endDate.setSeconds('00');
 
     let valid = currentDate > endDate 
-    if(valid) {
+    if(!valid) { //valid
       Swal.fire({
         title: 'Info!',
         text: `This session is finished`,
@@ -438,7 +475,7 @@ const checkEndTime = async (req, res) => {
     endDate.setSeconds('00');
 
     let valid = currentDate > endDate 
-    if(valid) {
+    if(!valid) { //valid
       Swal.fire({
         title: 'Info!',
         text: `This session is finished`,
