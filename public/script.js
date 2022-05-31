@@ -7,6 +7,10 @@ const backBtn = document.querySelector(".header__back");
 // import Helpers from "/views/helper.js";
 const  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+let path = 'https://e-safetalk.herokuapp.com'
+if(document.location.hostname == 'localhost'){
+  path = 'http://localhost:3001'
+}
 
 myVideo.muted = true;
 
@@ -293,14 +297,14 @@ const getSession = async(req, res) => {
     if(typeof SESSION_ID != "undefined") {
       console.log(SESSION_ID, 'session_id');
       //
-      let result = await axios.get(`http://localhost:3001/esafetalk/api/careseeker/session/view/${SESSION_ID}`)
+      let result = await axios.get(`${path}/esafetalk/api/careseeker/session/view/${SESSION_ID}`)
       let session_date = new Date(result.data.data.schedule.date);
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date != format_current_date) { //!=
+      if (format_session_date == format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
@@ -356,7 +360,7 @@ const getSchedule = async(req, res) => {
     // console.log(Helpers.getToken("careseeker"), "token");
     // console.log(SCHEDULE_ID, "schedule id");
     if(typeof SCHEDULE_ID != "undefined") { 
-      let result = await axios.get(`http://localhost:3001/esafetalk/api/user/schedule/view/${SCHEDULE_ID}`)
+      let result = await axios.get(`${path}/esafetalk/api/user/schedule/view/${SCHEDULE_ID}`)
       let session_date = new Date(result.data.data.date);
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
@@ -364,7 +368,7 @@ const getSchedule = async(req, res) => {
 
       console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date != format_current_date) { //!=
+      if (format_session_date == format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
