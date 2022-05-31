@@ -300,7 +300,7 @@ const getSession = async(req, res) => {
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date == format_current_date) { //!=
+      if (format_session_date != format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
@@ -333,7 +333,7 @@ const getSession = async(req, res) => {
         if (valid) { //!valid
           Swal.fire({
             title: 'Info!',
-            text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
+            text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
             icon: 'info',
             showCancelButton: false,
             showConfirmButton: false,
@@ -364,10 +364,10 @@ const getSchedule = async(req, res) => {
 
       console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date == format_current_date) { //!=
+      if (format_session_date != format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
-          text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
+          text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
           icon: 'info',
           showCancelButton: false,
           showConfirmButton: false,
@@ -451,7 +451,7 @@ const checkEndTime = async (req, res) => {
     endDate.setSeconds('00');
 
     let valid = currentDate > endDate 
-    if(!valid) { //valid
+    if(valid) { //valid
       Swal.fire({
         title: 'Info!',
         text: `This session is finished`,
@@ -475,7 +475,7 @@ const checkEndTime = async (req, res) => {
     endDate.setSeconds('00');
 
     let valid = currentDate > endDate 
-    if(!valid) { //valid
+    if(valid) { //valid
       Swal.fire({
         title: 'Info!',
         text: `This session is finished`,
