@@ -261,9 +261,9 @@ const getSession = async(req, res) => {
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
-      console.log(format_current_date, format_session_date);
+      console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date == format_current_date) {
+      if (format_session_date == format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
@@ -278,25 +278,25 @@ const getSession = async(req, res) => {
         // CHECK TIME IF WITHIN TIME SCHEDULE
         let current_time = current_date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
 
-        var startTime = getTwentyFourHourTime(result.data.data.schedule.time_starts);
+        var startTime = getTwentyFourHourTime(result.data.data.schedule.time_start);
         var endTime = getTwentyFourHourTime(result.data.data.schedule.time_end);
 
         let currentDate = new Date()   
-
         let startDate = new Date(currentDate.getTime());
         startDate.setHours(startTime.split(":")[0]);
         startDate.setMinutes(startTime.split(":")[1]);
+        startDate.setSeconds('00');
 
         let endDate = new Date(currentDate.getTime());
         endDate.setHours(endTime.split(":")[0]);
         endDate.setMinutes(endTime.split(":")[1]);
+        endDate.setSeconds('00');
 
         let valid = startDate < currentDate && endDate > currentDate
-        console.log(valid, "valid ba siya");
-        if (!valid) {
+        if (valid) { //!valid
           Swal.fire({
             title: 'Info!',
-            text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
+            text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
             icon: 'info',
             showCancelButton: false,
             showConfirmButton: false,
@@ -319,7 +319,60 @@ const getSchedule = async(req, res) => {
     // console.log(Helpers.getToken("careseeker"), "token");
     // console.log(SCHEDULE_ID, "schedule id");
     if(typeof SCHEDULE_ID != "undefined") { 
-      return await axios.get(`http://localhost:3001/esafetalk/api/user/schedule/view/${SCHEDULE_ID}`)
+      let result = await axios.get(`http://localhost:3001/esafetalk/api/user/schedule/view/${SCHEDULE_ID}`)
+      let session_date = new Date(result.data.data.date);
+      let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
+      let current_date = new Date();
+      let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
+
+      console.log(format_current_date, format_session_date , "time condition");
+      // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
+      if (format_session_date == format_current_date) { //!=
+        Swal.fire({
+          title: 'Info!',
+          text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
+          icon: 'info',
+          showCancelButton: false,
+          showConfirmButton: false,
+          closeOnClickOutside: false,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        })
+      } else {
+        // CHECK TIME IF WITHIN TIME SCHEDULE
+        let current_time = current_date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+
+        var startTime = getTwentyFourHourTime(result.data.data.time_start);
+        var endTime = getTwentyFourHourTime(result.data.data.time_end);
+
+        let currentDate = new Date()   
+        let startDate = new Date(currentDate.getTime());
+        startDate.setHours(startTime.split(":")[0]);
+        startDate.setMinutes(startTime.split(":")[1]);
+        startDate.setSeconds('00');
+
+        let endDate = new Date(currentDate.getTime());
+        endDate.setHours(endTime.split(":")[0]);
+        endDate.setMinutes(endTime.split(":")[1]);
+        endDate.setSeconds('00');
+
+        let valid = startDate < currentDate && endDate > currentDate
+        if (valid) { //!valid
+          Swal.fire({
+            title: 'Info!',
+            text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
+            icon: 'info',
+            showCancelButton: false,
+            showConfirmButton: false,
+            closeOnClickOutside: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+          })
+        } else {
+          return result;
+        }
+      }
+      
     }
   } catch (error) {
     console.error(error)
@@ -349,6 +402,62 @@ const getUsername = async(req, res) => {
   user = username;
   return username;
 }
+
+const checkEndTime = async (req, res) => {
+  if(typeof SESSION_ID != "undefined") {
+    let currentDate = new Date()
+    let result = await getSession()
+    let endTime = getTwentyFourHourTime(result.data.data.schedule.time_end);
+    let endDate = new Date(currentDate.getTime());
+    endDate.setHours(endTime.split(":")[0]);
+    endDate.setMinutes(endTime.split(":")[1]);
+    endDate.setSeconds('00');
+
+    let valid = currentDate > endDate 
+    if(valid) {
+      Swal.fire({
+        title: 'Info!',
+        text: `This session is finished`,
+        icon: 'info',
+        showCancelButton: false,
+        showConfirmButton: false,
+        closeOnClickOutside: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      })
+    }
+  }
+
+  if(typeof SCHEDULE_ID != "undefined") {
+    let currentDate = new Date()
+    let result = await getSchedule();
+    let endTime = getTwentyFourHourTime(result.data.data.time_end);
+    let endDate = new Date(currentDate.getTime());
+    endDate.setHours(endTime.split(":")[0]);
+    endDate.setMinutes(endTime.split(":")[1]);
+    endDate.setSeconds('00');
+
+    let valid = currentDate > endDate 
+    if(valid) {
+      Swal.fire({
+        title: 'Info!',
+        text: `This session is finished`,
+        icon: 'info',
+        showCancelButton: false,
+        showConfirmButton: false,
+        closeOnClickOutside: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      })
+    }
+  }
+}
+
+setInterval(function() {
+  checkEndTime();
+}, 60 * 1000);
+
+
 
 // const token = async(req, res) => {
 //   return  Helpers.getToken("careseeker");
