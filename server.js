@@ -18,10 +18,10 @@ app.use(express.static("public"));
 
 app.get("/", (req, res) => {
   if(req.query.session) {
-    res.redirect(`/${uuidv4()}?session="${req.query.session}"`);
+    res.redirect(`/${uuidv4()}?session=${req.query.session}`);
   }
   if(req.query.schedule) {
-    res.redirect(`/${uuidv4()}?schedule="${req.query.schedule}"`);
+    res.redirect(`/${uuidv4()}?schedule=${req.query.schedule}`);
   }
 });
 

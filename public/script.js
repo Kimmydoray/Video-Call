@@ -455,7 +455,7 @@ const checkEndTime = async (req, res) => {
     endDate.setSeconds('00');
 
     let valid = currentDate > endDate 
-    if(valid) { //valid
+    if(!valid) { //valid
       Swal.fire({
         title: 'Info!',
         text: `This session is finished`,
@@ -479,7 +479,7 @@ const checkEndTime = async (req, res) => {
     endDate.setSeconds('00');
 
     let valid = currentDate > endDate 
-    if(valid) { //valid
+    if(!valid) { //valid
       Swal.fire({
         title: 'Info!',
         text: `This session is finished`,
