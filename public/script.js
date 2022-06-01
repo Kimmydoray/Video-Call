@@ -304,7 +304,7 @@ const getSession = async(req, res) => {
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date == format_current_date) { //!=
+      if (format_session_date != format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
@@ -368,7 +368,7 @@ const getSchedule = async(req, res) => {
 
       console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date == format_current_date) { //!=
+      if (format_session_date != format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
