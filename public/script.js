@@ -334,7 +334,7 @@ const getSession = async(req, res) => {
         endDate.setSeconds('00');
 
         let valid = startDate < currentDate && endDate > currentDate
-        if (!valid) { //!valid
+        if (valid) { //!valid
           Swal.fire({
             title: 'Info!',
             text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
@@ -398,7 +398,7 @@ const getSchedule = async(req, res) => {
         endDate.setSeconds('00');
 
         let valid = startDate < currentDate && endDate > currentDate
-        if (!valid) { //!valid
+        if (valid) { //!valid
           Swal.fire({
             title: 'Info!',
             text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
