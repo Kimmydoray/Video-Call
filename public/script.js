@@ -304,7 +304,7 @@ const getSession = async(req, res) => {
       let session_date = new Date(result.data.data.schedule.date);
       
       let session_date_time = `${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}- ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`
-      dateTime.innerHTML += session_date_time
+      dateTime.innerHTML = session_date_time
       
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
@@ -375,7 +375,7 @@ const getSchedule = async(req, res) => {
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
       let session_date_time = `${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}- ${result.data.data.time_start} - ${result.data.data.time_end}`
-      dateTime.innerHTML += session_date_time
+      dateTime.innerHTML = session_date_time
       console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
       if (format_session_date != format_current_date) { //!=
