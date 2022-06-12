@@ -302,7 +302,9 @@ const getSession = async(req, res) => {
       //
       let result = await axios.get(`${path}/esafetalk/api/careseeker/session/view/${SESSION_ID}`)
       let session_date = new Date(result.data.data.schedule.date);
-      dateTime.innerHTML += session_date;
+      
+      let session_date_time = `${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}- ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`
+      dateTime.innerHTML += session_date_time
       
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
