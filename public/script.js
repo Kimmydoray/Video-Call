@@ -341,11 +341,11 @@ const getSession = async(req, res) => {
         endDate.setSeconds('00');
 
         let valid = startDate < currentDate && endDate > currentDate
-        
+        let textShow = endDate < currentDate? "This session ended on" : "This session will be start on"
         if (!valid) { //!valid
           Swal.fire({
             title: 'Info!',
-            text: `This session will be start ons: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
+            text: `${textShow}: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
             icon: 'info',
             showCancelButton: false,
             showConfirmButton: false,
@@ -410,10 +410,11 @@ const getSchedule = async(req, res) => {
         endDate.setSeconds('00');
 
         let valid = startDate < currentDate && endDate > currentDate
+        let textShow = endDate < currentDate? "This session ended on" : "This session will be start on"
         if (!valid) { //!valid
           Swal.fire({
             title: 'Info!',
-            text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.time_start} - ${result.data.data.time_end}`,
+            text: `${textShow}: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.time_start} - ${result.data.data.time_end}`,
             icon: 'info',
             showCancelButton: false,
             showConfirmButton: false,
