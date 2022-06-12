@@ -156,7 +156,7 @@ const addVideoStream = async(video, userName, stream) => {
           }
         }
         if(typeof SCHEDULE_ID != "undefined") {
-          let cpData =  await getSchedule();
+          let cpData = await getSchedule();
           if(cpData) {
             console.log(cpData);
             // user = cpData.data.data.cp_id.firstname;
@@ -309,7 +309,7 @@ const getSession = async(req, res) => {
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
-
+      console.log(format_session_date, format_current_date, "ontime")
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
       if (format_session_date != format_current_date) { //!=
         Swal.fire({
@@ -341,10 +341,11 @@ const getSession = async(req, res) => {
         endDate.setSeconds('00');
 
         let valid = startDate < currentDate && endDate > currentDate
+        
         if (!valid) { //!valid
           Swal.fire({
             title: 'Info!',
-            text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
+            text: `This session will be start ons: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
             icon: 'info',
             showCancelButton: false,
             showConfirmButton: false,
@@ -390,6 +391,7 @@ const getSchedule = async(req, res) => {
           allowEscapeKey: false,
         })
       } else {
+
         // CHECK TIME IF WITHIN TIME SCHEDULE
         let current_time = current_date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
 
@@ -411,7 +413,7 @@ const getSchedule = async(req, res) => {
         if (!valid) { //!valid
           Swal.fire({
             title: 'Info!',
-            text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
+            text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.time_start} - ${result.data.data.time_end}`,
             icon: 'info',
             showCancelButton: false,
             showConfirmButton: false,
@@ -458,11 +460,34 @@ const checkEndTime = async (req, res) => {
   if(typeof SESSION_ID != "undefined") {
     let currentDate = new Date()
     let result = await getSession()
+    
     let endTime = getTwentyFourHourTime(result.data.data.schedule.time_end);
     let endDate = new Date(currentDate.getTime());
     endDate.setHours(endTime.split(":")[0]);
     endDate.setMinutes(endTime.split(":")[1]);
     endDate.setSeconds('00');
+
+    
+    let currentDatePlusFiveMinutes = new Date(currentDate.getTime() + 5 * 60000)
+    currentDatePlusFiveMinutes.setSeconds('00')
+    
+    currentDatePlusFiveMinutes = `${currentDatePlusFiveMinutes.getHours()}:${currentDatePlusFiveMinutes.getMinutes()}`
+    endDate = `${endDate.getHours()}:${endDate.getMinutes()}`
+    let isValid = currentDatePlusFiveMinutes == endDate
+    console.log(currentDatePlusFiveMinutes, "current date", endDate)
+    console.log(isValid);
+    if(isValid) { //valid
+      Swal.fire({
+        title: 'Info!',
+        text: `This session will be finished in 5 minutes`,
+        icon: 'info',
+        showCancelButton: false,
+        showConfirmButton: true,
+        closeOnClickOutside: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      })
+    }
 
     let valid = currentDate > endDate 
     if(valid) { //valid
@@ -482,12 +507,35 @@ const checkEndTime = async (req, res) => {
   if(typeof SCHEDULE_ID != "undefined") {
     let currentDate = new Date()
     let result = await getSchedule();
+
     let endTime = getTwentyFourHourTime(result.data.data.time_end);
     let endDate = new Date(currentDate.getTime());
     endDate.setHours(endTime.split(":")[0]);
     endDate.setMinutes(endTime.split(":")[1]);
     endDate.setSeconds('00');
 
+    
+    let currentDatePlusFiveMinutes = new Date(currentDate.getTime() + 5 * 60000)
+    currentDatePlusFiveMinutes.setSeconds('00')
+    
+    currentDatePlusFiveMinutes = `${currentDatePlusFiveMinutes.getHours()}:${currentDatePlusFiveMinutes.getMinutes()}`
+    endDate = `${endDate.getHours()}:${endDate.getMinutes()}`
+    let isValid = currentDatePlusFiveMinutes == endDate
+    console.log(currentDatePlusFiveMinutes, "current date", endDate)
+    console.log(isValid);
+    if(isValid) { //valid
+      Swal.fire({
+        title: 'Info!',
+        text: `This session will be finished in 5 minutes`,
+        icon: 'info',
+        showCancelButton: false,
+        showConfirmButton: true,
+        closeOnClickOutside: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      })
+    }
+    
     let valid = currentDate > endDate 
     if(valid) { //valid
       Swal.fire({
