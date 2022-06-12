@@ -4,6 +4,8 @@ const videoName = document.getElementById("video-name");
 const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
+const dateTime = document.querySelector("#dateTime");
+
 // import Helpers from "/views/helper.js";
 const  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -300,6 +302,8 @@ const getSession = async(req, res) => {
       //
       let result = await axios.get(`${path}/esafetalk/api/careseeker/session/view/${SESSION_ID}`)
       let session_date = new Date(result.data.data.schedule.date);
+      dateTime.innerHTML += session_date;
+      
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
@@ -363,16 +367,19 @@ const getSchedule = async(req, res) => {
     if(typeof SCHEDULE_ID != "undefined") { 
       let result = await axios.get(`${path}/esafetalk/api/user/schedule/view/${SCHEDULE_ID}`)
       let session_date = new Date(result.data.data.date);
+      
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
+      let session_date_time = `${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}- ${result.data.data.time_start} - ${result.data.data.time_end}`
+      dateTime.innerHTML += session_date_time
       console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
       if (format_session_date != format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
-          text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
+          text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} \n ${result.data.data.time_start} - ${result.data.data.time_end}`,
           icon: 'info',
           showCancelButton: false,
           showConfirmButton: false,
