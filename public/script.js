@@ -3,8 +3,21 @@ const videoGrid = document.getElementById("video-grid");
 const videoName = document.getElementById("video-name");
 const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
-const backBtn = document.querySelector(".header__back");
-const dateTime = document.querySelector("#dateTime");
+// const backBtn = document.querySelector(".header__back");
+// const dateTime = document.querySelector("#dateTime");
+const calendarDate = document.querySelector("#calendar_date");
+const timeClock = document.querySelector("#time_clock");
+const warningModal = document.querySelector("#warning_modal");
+const dismissBtn = document.querySelector("#dismissBtn");
+const okBtn = document.querySelector("#okBtn");
+const activeCamera = document.querySelector("#active_camera")
+const disableCamera = document.querySelector("#disable_camera")
+const activeVoice = document.querySelector("#active_voice")
+const disableVoice = document.querySelector("#disable_voice")
+
+
+let startTimeCall = ""
+let endTimeCall = ""
 
 // import Helpers from "/views/helper.js";
 const  months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -16,12 +29,12 @@ if(document.location.hostname == 'localhost'){
 
 myVideo.muted = true;
 
-backBtn.addEventListener("click", () => {
-  document.querySelector(".main__left").style.display = "flex";
-  document.querySelector(".main__left").style.flex = "1";
-  document.querySelector(".main__right").style.display = "none";
-  document.querySelector(".header__back").style.display = "none";
-});
+// backBtn.addEventListener("click", () => {
+//   document.querySelector(".main__left").style.display = "flex";
+//   document.querySelector(".main__left").style.flex = "1";
+//   document.querySelector(".main__right").style.display = "none";
+//   document.querySelector(".header__back").style.display = "none";
+// });
 
 showChat.addEventListener("click", () => {
   document.querySelector(".main__right").style.display = "flex";
@@ -30,13 +43,23 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
+dismissBtn.addEventListener("click", () => {
+  console.log("none")
+  warningModal.style.display = "none"
+});
+
+okBtn.addEventListener("click", () => {
+  console.log("none")
+  warningModal.style.display = "none"
+});
+
 let user = "test";
 let id = "";
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  // port: "3030",
+  port: "3030",
 });
 
 let myVideoStream;
@@ -239,14 +262,18 @@ muteButton.addEventListener("click", () => {
   let html = '';
   if (enabled) {
     myVideoStream.getAudioTracks()[0].enabled = false;
-    html = `<i class="fas fa-microphone-slash"></i>`;
-    muteButton.classList.toggle("background__red");
-    muteButton.innerHTML = html;
+    activeVoice.style.display = "none"
+    disableVoice.style.display = "block"
+    // html = `<i class="fas fa-microphone-slash"></i>`;
+    // muteButton.classList.toggle("background__red");
+    // muteButton.innerHTML = html;
   } else {
     myVideoStream.getAudioTracks()[0].enabled = true;
-    html = `<i class="fas fa-microphone"></i>`;
-    muteButton.classList.toggle("background__red");
-    muteButton.innerHTML = html;
+    disableVoice.style.display = "none"
+    activeVoice.style.display = "block"
+    // html = `<i class="fas fa-microphone"></i>`;
+    // muteButton.classList.toggle("background__red");
+    // muteButton.innerHTML = html;
   }
 });
 
@@ -255,14 +282,19 @@ stopVideo.addEventListener("click", () => {
   let html = '';
   if (enabled) {
     myVideoStream.getVideoTracks()[0].enabled = false;
-    html = `<i class="fas fa-video-slash"></i>`;
-    stopVideo.classList.toggle("background__red");
-    stopVideo.innerHTML = html;
+    activeCamera.style.display = "none"
+    disableCamera.style.display = "block"
+    // html = `<i class="fas fa-video-slash"></i>`;
+    // stopVideo.classList.toggle("background__red");
+    // stopVideo.innerHTML = html;
   } else {
     myVideoStream.getVideoTracks()[0].enabled = true;
-    html = `<i class="fas fa-video"></i>`;
-    stopVideo.classList.toggle("background__red");
-    stopVideo.innerHTML = html;
+    disableCamera.style.display = "none"
+    activeCamera.style.display = "block"
+    
+    // html = `<i class="fas fa-video"></i>`;
+    // stopVideo.classList.toggle("background__red");
+    // stopVideo.innerHTML = html;
   }
 });
 
@@ -282,15 +314,25 @@ endButton.addEventListener("click", (e) => {
 
 
 socket.on("createMessage", (message, userName) => {
+  let current_date = new Date();
+  let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
+
   messages.innerHTML =
     messages.innerHTML +
-    `<div class="message">
-        <b><i class="far fa-user-circle"></i> <span> ${
-          // userName === user ? "me" : userName
-          userName
-        }</span> </b>
-        <span>${message}</span>
+    `<div class="cp--chat--bubble mb-2">
+      <div class="msg">
+        ${message}
+      </div>
+      <div class="date-time">${format_current_date}</div>
     </div>`;
+    
+    // `<div class="message">
+    //     <b><i class="far fa-user-circle"></i> <span> ${
+    //       // userName === user ? "me" : userName
+    //       userName
+    //     }</span> </b>
+    //     <span>${message}</span>
+    // </div>`;
 });
 
 // GET schedule data
@@ -304,14 +346,22 @@ const getSession = async(req, res) => {
       let session_date = new Date(result.data.data.schedule.date);
       
       let session_date_time = `${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}- ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`
-      dateTime.innerHTML = session_date_time
+      // dateTime.innerHTML = session_date_time
+      calendarDate.innerHTML = `<span>${months[session_date.getMonth()]}</span> <p>${session_date.getDate()}</p>`
+      timeClock.innerHTML = `${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`
+      startTimeCall = result.data.data.schedule.time_start
+      endTimeCall = result.data.data.schedule.time_end
       
+      // Set icons
+      disableCamera.style.display = "none"
+      activeCamera.style.display = "block"
+
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
       console.log(format_session_date, format_current_date, "ontime")
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date != format_current_date) { //!=
+      if (format_session_date == format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
@@ -341,18 +391,30 @@ const getSession = async(req, res) => {
         endDate.setSeconds('00');
 
         let valid = startDate < currentDate && endDate > currentDate
-        let textShow = endDate < currentDate? "This session ended on" : "This session will be start on"
+        let textShow = endDate < currentDate? "Video call session is about to end." : "This session will be start on"
         if (!valid) { //!valid
-          Swal.fire({
-            title: 'Info!',
-            text: `${textShow}: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
-            icon: 'info',
-            showCancelButton: false,
-            showConfirmButton: false,
-            closeOnClickOutside: false,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-          })
+
+          // Show warning
+          warningModal.innerHTML = `<p><b>${textShow}.</b> Your session time with Dr. Luna will be finishing in ${startTimeCall}.</p> 
+          <div class="action--btn">
+            <button class="extend-btn" id="okBtn">Ok</button>
+            <button class="dismiss-btn" id="dismissBtn">Dismiss</button>
+          </div>`
+
+          warningModal.style.display = "block"
+          
+          return result;
+
+          // Swal.fire({
+          //   title: 'Info!',
+          //   text: `${textShow}: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.schedule.time_start} - ${result.data.data.schedule.time_end}`,
+          //   icon: 'info',
+          //   showCancelButton: false,
+          //   showConfirmButton: false,
+          //   closeOnClickOutside: false,
+          //   allowOutsideClick: false,
+          //   allowEscapeKey: false,
+          // })
         } else {
           return result;
         }
@@ -379,7 +441,7 @@ const getSchedule = async(req, res) => {
       dateTime.innerHTML = session_date_time
       console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date != format_current_date) { //!=
+      if (format_session_date == format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} \n ${result.data.data.time_start} - ${result.data.data.time_end}`,
@@ -461,6 +523,7 @@ const checkEndTime = async (req, res) => {
   if(typeof SESSION_ID != "undefined") {
     let currentDate = new Date()
     let result = await getSession()
+    console.log(result, "result")
     
     let endTime = getTwentyFourHourTime(result.data.data.schedule.time_end);
     let endDate = new Date(currentDate.getTime());
