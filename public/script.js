@@ -713,7 +713,7 @@ const checkEndTime = async (req, res) => {
 
 setInterval(function() {
   checkEndTime();
-}, 4000);
+}, 60 * 1000);
 
 
 
