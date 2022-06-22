@@ -1,5 +1,9 @@
 const socket = io("/");
-const videoGrid = document.getElementById("video-grid");
+const videoGrid = document.getElementById("video-grid-cs");
+const videoGridCp = document.getElementById("video-grid-cp");
+const videoContainerCp = document.querySelector("#cp_vid_container");
+const videoContainerCs = document.querySelector("#cs_vid_container");
+
 const videoName = document.getElementById("video-name");
 const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
@@ -14,6 +18,13 @@ const activeCamera = document.querySelector("#active_camera")
 const disableCamera = document.querySelector("#disable_camera")
 const activeVoice = document.querySelector("#active_voice")
 const disableVoice = document.querySelector("#disable_voice")
+const sessionTitle = document.querySelector("#session_title")
+const chatMessage = document.getElementById("chat_message")
+const chatContainer = document.getElementById("chat_container")
+const closeChat = document.getElementById("close_chat")
+const activeChat = document.getElementById("active_chat")
+const disableChat = document.getElementById("disable_chat")
+const chatBody = document.querySelector('.chat--body')
 
 
 let startTimeCall = ""
@@ -37,19 +48,34 @@ myVideo.muted = true;
 // });
 
 showChat.addEventListener("click", () => {
-  document.querySelector(".main__right").style.display = "flex";
-  document.querySelector(".main__right").style.flex = "1";
-  document.querySelector(".main__left").style.display = "none";
-  document.querySelector(".header__back").style.display = "block";
+  const disable = chatMessage.disabled;
+  let html = '';
+  if (disable) {
+    chatMessage.disabled = false;
+    chatContainer.style.display = "block"
+    
+    activeChat.style.display = "block"
+    disableChat.style.display = "none"
+  } else {
+    chatMessage.disabled = true;
+    chatContainer.style.display = "none"
+
+    activeChat.style.display = "none"
+    disableChat.style.display = "block"
+  }
 });
 
+closeChat.addEventListener("click", () => {
+  showChat.click()
+  
+});
+
+
 dismissBtn.addEventListener("click", () => {
-  console.log("none")
   warningModal.style.display = "none"
 });
 
 okBtn.addEventListener("click", () => {
-  console.log("none")
   warningModal.style.display = "none"
 });
 
@@ -78,7 +104,7 @@ navigator.mediaDevices
     // });
 
     myVideoStream = stream;
-    var container_div = document.getElementById('video-grid');
+    var container_div = document.getElementById('video-grid-cp');
     var count = container_div.getElementsByTagName('video').length;
     if (count < 2) {
       addVideoStream(myVideo, user, stream);
@@ -88,7 +114,7 @@ navigator.mediaDevices
       call.answer(stream);
       const video = document.createElement("video");
       call.on("stream", (userVideoStream) => {
-        var container_div = document.getElementById('video-grid');
+        var container_div = document.getElementById('video-grid-cp');
         var count = container_div.getElementsByTagName('video').length;
         if (count < 2) {
           addVideoStream(video, user, userVideoStream);
@@ -107,7 +133,7 @@ const connectToNewUser = (userId, userName, stream) => {
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
   call.on("stream", (userVideoStream) => {
-    var container_div = document.getElementById('video-grid');
+    var container_div = document.getElementById('video-grid-cp');
     var count = container_div.getElementsByTagName('video').length;
     if (count < 2) {
       addVideoStream(video, userName, userVideoStream);
@@ -130,23 +156,61 @@ const addVideoStream = async(video, userName, stream) => {
       await video.addEventListener("loadedmetadata", async() => {
         if(typeof SESSION_ID != "undefined") {
           let csData =  await getSession();
-          console.log(csData);
           if(csData) {
             // user = csData.data.data.cs_id.profile.firstname;
-            let container_div = document.getElementById('video-grid');
-            let count = container_div.getElementsByTagName('video').length;
-            if (count > 1) {
-              let element = document.getElementById('video-name').children[1]
-              element.innerHTML = "Care provider: " + csData.data.data.schedule.cp_id.firstname;
-              console.log("ningsulod", element);
+            sessionTitle.innerHTML = `Video Session with ${csData.data.data.schedule.cp_id.firstname}`
+
+            let container_div_cs = document.getElementById('video-grid-cs');
+            let countVideoCs = container_div_cs.getElementsByTagName('video').length;
+            let container_div_cp = document.getElementById('video-grid-cp');
+            let countVideoCp = container_div_cp.getElementsByTagName('video').length;
+            if (countVideoCs == 0) {
+              videoGrid.append(video)
+              const videoGridStyle = document.querySelector("#cs_vid_container video");
+              console.log(videoGridStyle)
+              videoGridStyle.style.width="100%"
+              if (videoGridStyle != "undefined") {
+                videoContainerCs.classList.remove("d-none")
+              }
             }
-            if (count < 2) {
-              let nameHtml = `<span class="text-white p-10 name m-13">Care seeker: ${userName != "test"? userName : csData.data.data.cs_id.profile.firstname}</span>`;
-              videoName.innerHTML += nameHtml;
-            } 
-            if (count < 3) {
+
+            if (countVideoCp == 0) {
+              videoGridCp.append(video)
+              const videoGridStyle = document.querySelector("#cp_vid_container video");
+              console.log(videoGridStyle)
+              videoGridStyle.style.width="100%"
+              if (videoGridStyle != "undefined") {
+                videoContainerCp.classList.remove("d-none")
+              }
+            }
+
+            // if (count > 1) {
+            //   // let element = document.getElementById('video-name').children[1]
+            //   element.innerHTML = "Care provider: " + csData.data.data.schedule.cp_id.firstname;
+            // }
+            // if (count < 2) {
+            //   let nameHtml = `<span class="text-white p-10 name m-13">Care seeker: ${userName != "test"? userName : csData.data.data.cs_id.profile.firstname}</span>`;
+            //   // videoName.innerHTML += nameHtml;
+              
+            //   console.log(userName)
+            // } 
+            if (countVideoCs < 3) {
+              
               video.play();
-              videoGrid.append(video);
+              // videoContainerCp.remove("d-none")
+              // console.log(userName, csData.data.data.schedule.cp_id.firstname)
+              // if (userName == csData.data.data.schedule.cp_id.firstname) {
+              //   videoContainerCs.classList.remove("d-none")
+              //   videoGrid.append(video)
+              //   const videoGridStyle = document.querySelector("#cs_vid_container video");
+              //   videoGridStyle.style.width="100%"
+              // } else {
+              //   videoContainerCp.classList.remove("d-none")
+              //   videoGridCp.append(video)
+              //   const videoGridStyle = document.querySelector("#cp_vid_container video");
+              //   videoGridStyle.style.width="100%"
+              // }
+              
             } else {
               document.getElementById("video-grid").remove();
               
@@ -181,24 +245,40 @@ const addVideoStream = async(video, userName, stream) => {
         if(typeof SCHEDULE_ID != "undefined") {
           let cpData = await getSchedule();
           if(cpData) {
-            console.log(cpData);
+            sessionTitle.innerHTML = `Video Session with ${cpData.data.data.cp_id.firstname}`
             // user = cpData.data.data.cp_id.firstname;
-            let container_div = document.getElementById('video-grid');
-            let count = container_div.getElementsByTagName('video').length;
-            if (count > 1) {
-              let element = document.getElementById('video-name').children[1]
-              element.innerHTML = "Care Seeker: " + cpData.data.data.session_set.cs_id.profile.firstname;
-              console.log("ningsulod", element);
+            let container_div_cs = document.getElementById('video-grid-cs');
+            let countVideoCs = container_div_cs.getElementsByTagName('video').length;
+            let container_div_cp = document.getElementById('video-grid-cp');
+            let countVideoCp = container_div_cp.getElementsByTagName('video').length;
+            if (countVideoCs == 0) {
+              videoGrid.append(video)
+              const videoGridStyle = document.querySelector("#cs_vid_container video");
+              videoGridStyle.style.width="100%"
+              if (videoGridStyle) {
+                videoContainerCs.classList.remove("d-none")
+              }
             }
-            if (count < 2) {
+
+            if (countVideoCp == 0) {
+              
+              videoGridCp.append(video)
+              const videoGridStyle = document.querySelector("#cp_vid_container video");
+              videoGridStyle.style.width="100%"
+              if (videoGridStyle) {
+                videoContainerCp.classList.remove("d-none")
+              }
+            }
+            
+            if (countVideoCs == 2) {
               let nameHtml = `<span class="text-white p-10 name m-13">Care provider: ${userName != "test"? userName: cpData.data.data.cp_id.firstname}</span>`;
-              videoName.innerHTML += nameHtml;
+              // videoName.innerHTML += nameHtml;
             } 
-            if (count < 3) {
+
+            if (countVideoCs < 3) {
               video.play();
-              videoGrid.append(video);
             } else {
-              document.getElementById("video-grid").remove();
+              document.getElementById("video-grid-cs").remove();
               Swal.fire({
                 title: 'Info!',
                 text: `This session is only limited to 2 users`,
@@ -320,12 +400,15 @@ socket.on("createMessage", (message, userName) => {
   messages.innerHTML =
     messages.innerHTML +
     `<div class="cp--chat--bubble mb-2">
+      <label>${userName}</label>
       <div class="msg">
         ${message}
       </div>
       <div class="date-time">${format_current_date}</div>
     </div>`;
-    
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+
     // `<div class="message">
     //     <b><i class="far fa-user-circle"></i> <span> ${
     //       // userName === user ? "me" : userName
@@ -340,7 +423,7 @@ const getSession = async(req, res) => {
   try {
     // console.log(Helpers.getToken("careseeker"), "token");
     if(typeof SESSION_ID != "undefined") {
-      console.log(SESSION_ID, 'session_id');
+      // console.log(SESSION_ID, 'session_id');
       //
       let result = await axios.get(`${path}/esafetalk/api/careseeker/session/view/${SESSION_ID}`)
       let session_date = new Date(result.data.data.schedule.date);
@@ -359,7 +442,7 @@ const getSession = async(req, res) => {
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
-      console.log(format_session_date, format_current_date, "ontime")
+      // console.log(format_session_date, format_current_date, "ontime")
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
       if (format_session_date == format_current_date) { //!=
         Swal.fire({
@@ -392,10 +475,9 @@ const getSession = async(req, res) => {
 
         let valid = startDate < currentDate && endDate > currentDate
         let textShow = endDate < currentDate? "Video call session is about to end." : "This session will be start on"
-        if (!valid) { //!valid
-
+        if (valid) { //!valid
           // Show warning
-          warningModal.innerHTML = `<p><b>${textShow}.</b> Your session time with Dr. Luna will be finishing in ${startTimeCall}.</p> 
+          warningModal.innerHTML = `<p><b>${textShow}.</b> Your session time with ${result.data.data.schedule.cp_id.nickname} will be finishing in ${endTimeCall}.</p> 
           <div class="action--btn">
             <button class="extend-btn" id="okBtn">Ok</button>
             <button class="dismiss-btn" id="dismissBtn">Dismiss</button>
@@ -432,14 +514,20 @@ const getSchedule = async(req, res) => {
     if(typeof SCHEDULE_ID != "undefined") { 
       let result = await axios.get(`${path}/esafetalk/api/user/schedule/view/${SCHEDULE_ID}`)
       let session_date = new Date(result.data.data.date);
+      console.log(result, "nunsad")
+
+      calendarDate.innerHTML = `<span>${months[session_date.getMonth()]}</span> <p>${session_date.getDate()}</p>`
+      timeClock.innerHTML = `${result.data.data.time_start} - ${result.data.data.time_end}`
+      startTimeCall = result.data.data.time_start
+      endTimeCall = result.data.data.time_end
       
       let format_session_date = `${session_date.getFullYear()}-${session_date.getDate()}-${session_date.getMonth()}`
       let current_date = new Date();
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
 
       let session_date_time = `${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}- ${result.data.data.time_start} - ${result.data.data.time_end}`
-      dateTime.innerHTML = session_date_time
-      console.log(format_current_date, format_session_date , "time condition");
+      // dateTime.innerHTML = session_date_time
+      // console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
       if (format_session_date == format_current_date) { //!=
         Swal.fire({
@@ -473,7 +561,7 @@ const getSchedule = async(req, res) => {
 
         let valid = startDate < currentDate && endDate > currentDate
         let textShow = endDate < currentDate? "This session ended on" : "This session will be start on"
-        if (!valid) { //!valid
+        if (valid) { //!valid
           Swal.fire({
             title: 'Info!',
             text: `${textShow}: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.time_start} - ${result.data.data.time_end}`,
@@ -523,7 +611,7 @@ const checkEndTime = async (req, res) => {
   if(typeof SESSION_ID != "undefined") {
     let currentDate = new Date()
     let result = await getSession()
-    console.log(result, "result")
+    // console.log(result, "result")
     
     let endTime = getTwentyFourHourTime(result.data.data.schedule.time_end);
     let endDate = new Date(currentDate.getTime());
@@ -538,8 +626,8 @@ const checkEndTime = async (req, res) => {
     currentDatePlusFiveMinutes = `${currentDatePlusFiveMinutes.getHours()}:${currentDatePlusFiveMinutes.getMinutes()}`
     endDate = `${endDate.getHours()}:${endDate.getMinutes()}`
     let isValid = currentDatePlusFiveMinutes == endDate
-    console.log(currentDatePlusFiveMinutes, "current date", endDate)
-    console.log(isValid);
+    // console.log(currentDatePlusFiveMinutes, "current date", endDate)
+    // console.log(isValid);
     if(isValid) { //valid
       Swal.fire({
         title: 'Info!',
@@ -585,8 +673,8 @@ const checkEndTime = async (req, res) => {
     currentDatePlusFiveMinutes = `${currentDatePlusFiveMinutes.getHours()}:${currentDatePlusFiveMinutes.getMinutes()}`
     endDate = `${endDate.getHours()}:${endDate.getMinutes()}`
     let isValid = currentDatePlusFiveMinutes == endDate
-    console.log(currentDatePlusFiveMinutes, "current date", endDate)
-    console.log(isValid);
+    // console.log(currentDatePlusFiveMinutes, "current date", endDate)
+    // console.log(isValid);
     if(isValid) { //valid
       Swal.fire({
         title: 'Info!',

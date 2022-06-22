@@ -298,7 +298,7 @@
   padding-top: 63%;
   border-radius: 15px;
   filter: drop-shadow(0px 10px 18px rgba(44, 87, 110, 0.20));
-  border: solid 8px white;
+  /* border: solid 8px white; */
 }
 .cs--vid--position {
   width: 100%;
