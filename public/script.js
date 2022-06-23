@@ -479,7 +479,7 @@ const getSession = async(req, res) => {
 
         let valid = startDate < currentDate && endDate > currentDate
         let textShow = endDate < currentDate? "Video call session is about to end." : "This session will be start on"
-        if (valid) { //!valid
+        if (!valid) { //!valid
           // Show warning
           
           
