@@ -627,7 +627,7 @@ const checkEndTime = async (req, res) => {
     // console.log(currentDatePlusFiveMinutes, "current date", endDate)
     // console.log(isValid);
     if(isValid) { //valid
-      warningModal.innerHTML = `<p><b>${textShow}.</b> Your session time with ${result.data.data.schedule.cp_id.nickname} will be finishing in 5minutes.</p> 
+      warningModal.innerHTML = `<p>Your session time with ${result.data.data.schedule.cp_id.nickname} will be finishing in 5minutes.</p> 
           <div class="action--btn">
             <button class="extend-btn" id="okBtn">Ok</button>
             <button class="dismiss-btn" id="dismissBtn">Dismiss</button>
