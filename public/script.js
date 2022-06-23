@@ -683,20 +683,18 @@ const checkEndTime = async (req, res) => {
     // console.log(currentDatePlusFiveMinutes, "current date", endDate)
     // console.log(isValid);
     if(isValid) { //valid
-      Swal.fire({
-        title: 'Info!',
-        text: `This session will be finished in 5 minutes`,
-        icon: 'info',
-        showCancelButton: false,
-        showConfirmButton: true,
-        closeOnClickOutside: true,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-      })
+      warningModal.innerHTML = `<p><b>${textShow}.</b> Your session time with ${result.data.data.cp_id.firstname} will be finishing in 5 minutes.</p> 
+          <div class="action--btn">
+            <button class="extend-btn" id="okBtn">Ok</button>
+            <button class="dismiss-btn" id="dismissBtn">Dismiss</button>
+          </div>`
+
+          warningModal.style.display = "block"
     }
     
     let valid = currentDate > endDate 
     if(valid) { //valid
+      
       Swal.fire({
         title: 'Info!',
         text: `This session is finished`,
