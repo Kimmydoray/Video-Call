@@ -25,6 +25,7 @@ const closeChat = document.getElementById("close_chat")
 const activeChat = document.getElementById("active_chat")
 const disableChat = document.getElementById("disable_chat")
 const chatBody = document.querySelector('.chat--body')
+const hangUpBtn = document.querySelector('.hangup-btn');
 
 
 let startTimeCall = ""
@@ -88,8 +89,8 @@ let id = "";
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
-  host: "/"
-  // port: "3030",
+  host: "/",
+  port: "3030",
 });
 
 let myVideoStream;
@@ -124,14 +125,29 @@ navigator.mediaDevices
           addVideoStream(video, user, userVideoStream);
         }
       });
+      call.on("close", function() {
+        console.log("closing");
+        handlePeerDisconnect();
+      });
     });
-
+    
     socket.on("user-connected", (userId, userName) => {
       user = userName;
       connectToNewUser(userId, userName, stream);
     });
+
+    socket.on("user-disconnected", ()=>{
+
+      warningModal.innerHTML = `<p>Session has been ended.</p>`
+      warningModal.style.display = "block"
+
+      videoContainerCs.classList.add("d-none")
+      handlePeerDisconnect();
+    });
+    
     
   });
+  
 
 const connectToNewUser = (userId, userName, stream) => {
   const call = peer.call(userId, stream);
@@ -143,11 +159,18 @@ const connectToNewUser = (userId, userName, stream) => {
       addVideoStream(video, userName, userVideoStream);
     }
   });
+  call.on("close", function() {
+    handlePeerDisconnect();
+    
+    videoContainerCs.classList.add("d-none")
+  });
 };
 
 peer.on("open", async (id) => {
   user = await getUsername();
   socket.emit("join-room", ROOM_ID, id, user);
+
+  
 });
 
 const addVideoStream = async(video, userName, stream) => {
@@ -396,6 +419,12 @@ endButton.addEventListener("click", (e) => {
 });
 
 
+hangUpBtn.addEventListener('click', function (){
+  console.log("closing the connection")
+  handlePeerDisconnect()
+})
+
+
 
 socket.on("createMessage", (message, userName) => {
   let current_date = new Date();
@@ -421,6 +450,22 @@ socket.on("createMessage", (message, userName) => {
     //     <span>${message}</span>
     // </div>`;
 });
+
+function handlePeerDisconnect() {
+  // manually close the peer connections
+  for (let conns in peer.connections) {
+    peer.connections[conns].forEach((conn, index, array) => {
+      console.log(`closing ${conn.connectionId} peerConnection (${index + 1}/${array.length})`, conn.peerConnection);
+      conn.peerConnection.close();
+      videoContainerCs.classList.add("d-none")
+      socket.emit("disconnected");
+
+      // close it using peerjs methods
+      if (conn.close)
+        conn.close();
+    });
+  }
+}
 
 // GET schedule data
 const getSession = async(req, res) => {

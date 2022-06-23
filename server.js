@@ -45,9 +45,14 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("createMessage", message, userName);
     });
     socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userId, userName)
+      socket.to(roomId).broadcast.emit('user-disconnected', userName)
     })
   });
+  
+  socket.on('disconnected', () => {
+    socket.broadcast.emit("user-disconnected");
+    // socket.to().broadcast.emit('user-disconnected', userName)
+  })
   // socket.on("vcall", (roomId, name) => {
   //   socket.to(roomId).broadcast.emit("vcall-connected", name);
   // });
