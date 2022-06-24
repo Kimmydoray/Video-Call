@@ -89,8 +89,8 @@ let id = "";
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
-  host: "/",
-  port: "3030",
+  host: "/"
+  // port: "3030",
 });
 
 let myVideoStream;
