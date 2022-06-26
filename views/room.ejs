@@ -66,9 +66,11 @@
     <div id="comms--body">
       <div class="video--call--container">
         <header>
-          <button class="back--btn">
-            <span class="material-icons"> arrow_back_ios_new </span>
-          </button>
+          <a href="https://cs.esafetalk.com" id="backArrow" class="text-decoration-none">
+            <button class="back--btn ">
+              <span class="material-icons">arrow_back_ios_new </span>
+            </button>
+          </a>
           <h1 id="session_title"></h1>
           <div class="time--clock">
             <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -93,20 +95,24 @@
           </div>
           <!-- End Modal -->
           <!-- Start Video -->
-          <div class="cp--vid--container videos__group d-none" id="cp_vid_container">
-            <div class="cp--vid-responsive">
-              <div id="video-grid-cp" class="cs--vid--position">
-                
+          <div class="row">
+            <div class="cp--vid--container videos__group d-none col-md-6" id="cp_vid_container">
+              <div class="cp--vid-responsive">
+                <div id="video-grid-cp" class="cs--vid--position">
+                  
+                </div>
+              </div>
+            </div>
+
+            <div class="cp--vid--container d-none col-md-6" id="cs_vid_container">
+              <div class="cs--vid-responsive">
+                <div id="video-grid-cs" class="cs--vid--position">
+        
+                </div>
               </div>
             </div>
           </div>
-          <div class="cs--vid--container d-none" id="cs_vid_container">
-            <div class="cs--vid-responsive">
-              <div id="video-grid-cs" class="cs--vid--position">
-      
-              </div>
-            </div>
-          </div>
+          
           <!-- <div id="video-grid">
             <div id="video-name"></div>
   

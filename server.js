@@ -45,12 +45,12 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("createMessage", message, userName);
     });
     socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userName)
+      socket.to(roomId).broadcast.emit('user-disconnected', "User has been disconnected")
     })
   });
   
-  socket.on('disconnected', () => {
-    socket.broadcast.emit("user-disconnected");
+  socket.on('disconnected', (text) => {
+    socket.broadcast.emit("user-disconnected", text);
     // socket.to().broadcast.emit('user-disconnected', userName)
   })
   // socket.on("vcall", (roomId, name) => {
