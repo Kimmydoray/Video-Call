@@ -160,11 +160,6 @@ const connectToNewUser = (userId, userName, stream) => {
       addVideoStream(video, userName, userVideoStream);
     }
   });
-  call.on("close", function() {
-    handlePeerDisconnect("User has been disconnected");
-    
-    videoContainerCs.classList.add("d-none")
-  });
 };
 
 peer.on("open", async (id) => {
