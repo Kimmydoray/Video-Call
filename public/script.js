@@ -25,7 +25,8 @@ const closeChat = document.getElementById("close_chat")
 const activeChat = document.getElementById("active_chat")
 const disableChat = document.getElementById("disable_chat")
 const chatBody = document.querySelector('.chat--body')
-const hangUpBtn = document.querySelector('.hangup-btn');
+const hangUpBtn = document.querySelector('.hangup-btn')
+const backArrow = document.getElementById("backArrow")
 
 
 let startTimeCall = ""
@@ -53,7 +54,7 @@ showChat.addEventListener("click", () => {
   let html = '';
   if (disable) {
     chatMessage.disabled = false;
-    chatContainer.style.display = "block"
+    chatContainer.style.display = ""
     
     activeChat.style.display = "block"
     disableChat.style.display = "none"
@@ -127,7 +128,7 @@ navigator.mediaDevices
       });
       call.on("close", function() {
         console.log("closing");
-        handlePeerDisconnect();
+        handlePeerDisconnect("User has been disconnected");
       });
     });
     
@@ -136,13 +137,13 @@ navigator.mediaDevices
       connectToNewUser(userId, userName, stream);
     });
 
-    socket.on("user-disconnected", ()=>{
+    socket.on("user-disconnected", (text)=>{
 
-      warningModal.innerHTML = `<p>Session has been ended.</p>`
+      warningModal.innerHTML = `<p>${text}</p>`
       warningModal.style.display = "block"
 
       videoContainerCs.classList.add("d-none")
-      handlePeerDisconnect();
+      handlePeerDisconnect("User has been disconnected");
     });
     
     
@@ -160,7 +161,7 @@ const connectToNewUser = (userId, userName, stream) => {
     }
   });
   call.on("close", function() {
-    handlePeerDisconnect();
+    handlePeerDisconnect("User has been disconnected");
     
     videoContainerCs.classList.add("d-none")
   });
@@ -415,20 +416,23 @@ endButton.addEventListener("click", (e) => {
   let res = confirm("Are you sure you want to end this session?");
   if (res) {
     alert("The session ended");
+    console.log("closing the connection")
+    handlePeerDisconnect("User Ended the call")
   }
 });
 
 
-hangUpBtn.addEventListener('click', function (){
-  console.log("closing the connection")
-  handlePeerDisconnect()
-})
+// hangUpBtn.addEventListener('click', function (){
+//   console.log("closing the connection")
+//   handlePeerDisconnect()
+// })
 
 
 
 socket.on("createMessage", (message, userName) => {
   let current_date = new Date();
-  let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
+  console.log((current_date.getMonth()), (current_date.getMonth()).toString.length);
+  let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${((current_date.getMonth()).toString.length) == 1? '0' + current_date.getMonth(): current_date.getMonth()} ${current_date.getHours()}:${current_date.getMinutes()}`
 
   messages.innerHTML =
     messages.innerHTML +
@@ -451,14 +455,14 @@ socket.on("createMessage", (message, userName) => {
     // </div>`;
 });
 
-function handlePeerDisconnect() {
+function handlePeerDisconnect(text) {
   // manually close the peer connections
   for (let conns in peer.connections) {
     peer.connections[conns].forEach((conn, index, array) => {
       console.log(`closing ${conn.connectionId} peerConnection (${index + 1}/${array.length})`, conn.peerConnection);
       conn.peerConnection.close();
       videoContainerCs.classList.add("d-none")
-      socket.emit("disconnected");
+      socket.emit("disconnected", text);
 
       // close it using peerjs methods
       if (conn.close)
@@ -474,6 +478,7 @@ const getSession = async(req, res) => {
     if(typeof SESSION_ID != "undefined") {
       // console.log(SESSION_ID, 'session_id');
       //
+
       let result = await axios.get(`${path}/esafetalk/api/careseeker/session/view/${SESSION_ID}`)
       let session_date = new Date(result.data.data.schedule.date);
       
@@ -493,7 +498,7 @@ const getSession = async(req, res) => {
       let format_current_date = `${current_date.getFullYear()}-${current_date.getDate()}-${current_date.getMonth()}`
       // console.log(format_session_date, format_current_date, "ontime")
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date != format_current_date) { //!=
+      if (format_session_date == format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be open on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()}`,
@@ -526,8 +531,6 @@ const getSession = async(req, res) => {
         let textShow = endDate < currentDate? " Video call session has been ended" : "This session will be start on"
         if (!valid) { //!valid
           // Show warning
-          
-          
 
           Swal.fire({
             title: 'Info!',
@@ -555,6 +558,7 @@ const getSchedule = async(req, res) => {
     // console.log(Helpers.getToken("careseeker"), "token");
     // console.log(SCHEDULE_ID, "schedule id");
     if(typeof SCHEDULE_ID != "undefined") { 
+      backArrow.href = "https://porta.esafetalk.com"
       let result = await axios.get(`${path}/esafetalk/api/user/schedule/view/${SCHEDULE_ID}`)
       let session_date = new Date(result.data.data.date);
       console.log(result, "nunsad")
@@ -572,7 +576,7 @@ const getSchedule = async(req, res) => {
       // dateTime.innerHTML = session_date_time
       // console.log(format_current_date, format_session_date , "time condition");
       // CHECK IF CURRENT DATE EQUALS TO SESSION DATE
-      if (format_session_date != format_current_date) { //!=
+      if (format_session_date == format_current_date) { //!=
         Swal.fire({
           title: 'Info!',
           text: `This session will be start on: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} \n ${result.data.data.time_start} - ${result.data.data.time_end}`,
@@ -604,7 +608,7 @@ const getSchedule = async(req, res) => {
 
         let valid = startDate < currentDate && endDate > currentDate
         let textShow = endDate < currentDate? "This session ended on" : "This session will be start on"
-        if (!valid) { //!valid
+        if (valid) { //!valid
           Swal.fire({
             title: 'Info!',
             text: `${textShow}: ${months[session_date.getMonth()]} ${session_date.getDate()}, ${session_date.getFullYear()} ${result.data.data.time_start} - ${result.data.data.time_end}`,
